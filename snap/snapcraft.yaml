@@ -1,9 +1,10 @@
 name: ghostty
-base: core24
+version: v1.1.3
 summary: A terminal emulator
 description: |
   Ghostty is a fast, feature-rich, and cross-platform terminal emulator that
   uses platform-native UI and GPU acceleration.
+base: core24
 grade: stable
 confinement: classic
 contact: https://github.com/ghostty-org/ghostty/discussions
@@ -66,7 +67,7 @@ parts:
 
   ghostty:
     source: https://github.com/ghostty-org/ghostty.git
-    source-tag: "v1.1.3"
+    source-tag: $SNAPCRAFT_PROJECT_VERSION
     after: [zig]
     plugin: nil
     build-attributes: [enable-patchelf]
