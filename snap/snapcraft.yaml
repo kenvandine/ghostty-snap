@@ -99,6 +99,8 @@ parts:
     build-environment:
       - TERMINFO: $CRAFT_STAGE/usr/share/terminfo
       - PATH: $CRAFT_STAGE/usr/bin:$PATH
+      - LD_LIBRARY_PATH: $CRAFT_STAGE/usr/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+
     override-pull: |
       craftctl default
       patch -p1 < $SNAPCRAFT_PROJECT_DIR/snap/local/patches/env_cleanup.patch
