@@ -83,7 +83,7 @@ parts:
   ghostty:
     source: https://github.com/ghostty-org/ghostty.git
     source-tag: $SNAPCRAFT_PROJECT_VERSION
-    after: [zig]
+    after: [zig, ncurses]
     plugin: nil
     build-attributes: [enable-patchelf]
     build-packages:
