@@ -40,7 +40,7 @@ parts:
       launcher: bin/
 
   ncurses:
-    source: https://invisible-mirror.net/archives/ncurses/current/ncurses-6.5-20250614.tgz
+    source: https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/ncurses/6.5+20250216-2/ncurses_6.5+20250216.orig.tar.gz
     plugin: autotools
     build-attributes: [enable-patchelf]
     autotools-configure-parameters:
