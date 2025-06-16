@@ -29,7 +29,6 @@ apps:
       PATH: /snap/ghostty/current/bin:/snap/ghostty/current/usr/bin:$PATH
       LC_ALL: C.UTF-8
       GHOSTTY_RESOURCES_DIR: /snap/ghostty/current/share/ghostty
-      TERMINFO: /snap/ghostty/current/usr/share/terminfo
 
 parts:
   launcher:
@@ -52,6 +51,8 @@ parts:
       - --prefix=/usr
     build-packages:
       - libtinfo-dev
+    prime:
+      - -*
 
   zig:
     plugin: nil
