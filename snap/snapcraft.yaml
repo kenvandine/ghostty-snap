@@ -96,6 +96,9 @@ parts:
       - git
       - patchelf
       - gettext
+    build-environment:
+      - TERMINFO: $CRAFT_STAGE/usr/share/terminfo
+      - PATH: $CRAFT_STAGE/usr/bin:$PATH
     override-pull: |
       craftctl default
       patch -p1 < $SNAPCRAFT_PROJECT_DIR/snap/local/patches/env_cleanup.patch
