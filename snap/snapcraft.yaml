@@ -29,6 +29,7 @@ apps:
       PATH: /snap/ghostty/current/bin:/snap/ghostty/current/usr/bin:$PATH
       LC_ALL: C.UTF-8
       GHOSTTY_RESOURCES_DIR: /snap/ghostty/current/share/ghostty
+      TERMINFO: /snap/ghostty/current/usr/share/terminfo
 
 parts:
   launcher:
@@ -37,6 +38,20 @@ parts:
     source-type: local
     organize:
       launcher: bin/
+
+  ncurses:
+    source: https://invisible-mirror.net/archives/ncurses/current/ncurses-6.5-20250614.tgz
+    plugin: autotools
+    build-attributes: [enable-patchelf]
+    autotools-configure-parameters:
+      - --enable-widec
+      - --with-shared
+      - --without-debug
+      - --without-ada
+      - --enable-rpath
+      - --prefix=/usr
+    build-packages:
+      - libtinfo-dev
 
   zig:
     plugin: nil
