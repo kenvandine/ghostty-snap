@@ -39,11 +39,10 @@ apps:
       LC_ALL: C.UTF-8
       GHOSTTY_RESOURCES_DIR: /snap/ghostty/current/share/ghostty
   service:
-    command: bin/ghostty --launched-from=systemd
-    command-chain: [bin/launcher]
+    command: app/service
+    command-chain: [app/launcher]
     daemon: dbus
-    passthrough:
-      daemon-scope: user
+    daemon-scope: user
     activates-on: [dbus-slot]
 
 parts:
@@ -53,6 +52,7 @@ parts:
     source-type: local
     organize:
       launcher: app/
+      service: app/
 
   ncurses:
     source: https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/ncurses/6.5+20250216-2/ncurses_6.5+20250216.orig.tar.gz
