@@ -17,6 +17,17 @@ platforms:
   amd64:
   arm64:
 
+environment:
+  PATH: /snap/ghostty/current/bin:/snap/ghostty/current/usr/bin:$PATH
+  LC_ALL: C.UTF-8
+  GHOSTTY_RESOURCES_DIR: /snap/ghostty/current/share/ghostty
+
+slots:
+  dbus-slot:
+    interface: dbus
+    name: com.mitchellh.ghostty
+    bus: session
+
 apps:
   ghostty:
     command: bin/ghostty
@@ -27,6 +38,13 @@ apps:
     environment:
       LC_ALL: C.UTF-8
       GHOSTTY_RESOURCES_DIR: /snap/ghostty/current/share/ghostty
+  service:
+    command: bin/ghostty --launched-from=systemd
+    command-chain: [bin/launcher]
+    daemon: dbus
+    passthrough:
+      daemon-scope: user
+    activates-on: [dbus-slot]
 
 parts:
   launcher:
