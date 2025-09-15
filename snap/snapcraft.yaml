@@ -87,6 +87,8 @@ parts:
     after: [zig, ncurses]
     plugin: nil
     build-attributes: [enable-patchelf]
+    build-snaps:
+      - blueprint-compiler
     build-packages:
       - libgtk-4-dev
       - libadwaita-1-dev
