@@ -1,10 +1,10 @@
 name: ghostty
-version: v1.1.3
+version: v1.2.0
+base: core24
 summary: A terminal emulator
 description: |
   Ghostty is a fast, feature-rich, and cross-platform terminal emulator that
   uses platform-native UI and GPU acceleration.
-base: core24
 grade: stable
 confinement: classic
 contact: https://github.com/ghostty-org/ghostty/discussions
@@ -69,7 +69,7 @@ parts:
       rm -rf $CRAFT_PART_SRC/*
 
       if [[ -n $arch ]]; then
-        curl -LO --retry-connrefused --retry 10 https://ziglang.org/download/0.13.0/zig-linux-$arch-0.13.0.tar.xz
+        curl -LO --retry-connrefused --retry 10 https://ziglang.org/download/0.14.0/zig-linux-$arch-0.14.0.tar.xz
       else
         echo "Unsupported arch"
         exit 1
@@ -88,11 +88,8 @@ parts:
     plugin: nil
     build-attributes: [enable-patchelf]
     build-packages:
-      - blueprint-compiler
       - libgtk-4-dev
       - libadwaita-1-dev
-      # TODO: Add when the Snap is updated to Ubuntu 24.10+
-      # - gtk4-layer-shell
       - libxml2-utils
       - git
       - patchelf
@@ -106,8 +103,8 @@ parts:
       craftctl default
       patch -p1 < $SNAPCRAFT_PROJECT_DIR/snap/local/patches/env_cleanup.patch
     override-build: |
-      craftctl set version=$(git describe --abbrev=8)
-      $CRAFT_PART_SRC/../../zig/src/zig build -Dpatch-rpath=\$ORIGIN/../usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR:/snap/core24/current/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR -Doptimize=ReleaseFast -Dcpu=baseline
+      # TODO: Remove -fno-sys=gtk4-layer-shell when we upgrade to a version that packages it Ubuntu 24.10+
+      $CRAFT_PART_SRC/../../zig/src/zig build -Dpatch-rpath=\$ORIGIN/../usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR:/snap/core24/current/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR -Doptimize=ReleaseFast -Dcpu=baseline -fno-sys=gtk4-layer-shell
       cp -rp zig-out/* $CRAFT_PART_INSTALL/
       sed -i 's|Icon=com.mitchellh.ghostty|Icon=${SNAP}/share/icons/hicolor/512x512/apps/com.mitchellh.ghostty.png|g' $CRAFT_PART_INSTALL/share/applications/com.mitchellh.ghostty.desktop
 
@@ -119,6 +116,7 @@ parts:
       - libglib2.0-0t64
       - libgtk-4-1
       - libgtk-4-media-gstreamer
+      - libgtksourceview-5-0
       - ibus-gtk4
       - libpciaccess0
       - libtinfo6
