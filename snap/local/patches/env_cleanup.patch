@@ -1,32 +1,14 @@
-diff --git a/src/apprt/gtk/Surface.zig b/src/apprt/gtk/Surface.zig
-index 2bd881e7..834ace7d 100644
---- a/src/apprt/gtk/Surface.zig
-+++ b/src/apprt/gtk/Surface.zig
-@@ -2310,6 +2310,27 @@ pub fn defaultTermioEnv(self: *Surface) !std.process.EnvMap {
-     env.remove("GDK_DISABLE");
-     env.remove("GSK_RENDERER");
+diff --git a/src/apprt/gtk/class/surface.zig b/src/apprt/gtk/class/surface.zig
+index c26d0c1ef..03ca6ba75 100644
+--- a/src/apprt/gtk/class/surface.zig
++++ b/src/apprt/gtk/class/surface.zig
+@@ -1240,6 +1240,9 @@ pub const Surface = extern struct {
+             env.remove("GDK_PIXBUF_MODULEDIR");
+             env.remove("GDK_PIXBUF_MODULE_FILE");
+             env.remove("GTK_PATH");
++            env.remove("XDG_CONFIG_HOME");
++            env.remove("XDG_CACHE_HOME");
++            env.remove("XDG_DATA_HOME");
+         }
  
-+    // Unset environment varies set by snaps if we're running in a snap.
-+    // This allows Ghostty to further launch additional snaps.
-+    if (env.get("SNAP")) |_| {
-+        env.remove("SNAP");
-+        env.remove("DRIRC_CONFIGDIR");
-+        env.remove("__EGL_EXTERNAL_PLATFORM_CONFIG_DIRS");
-+        env.remove("__EGL_VENDOR_LIBRARY_DIRS");
-+        env.remove("LD_LIBRARY_PATH");
-+        env.remove("LIBGL_DRIVERS_PATH");
-+        env.remove("LIBVA_DRIVERS_PATH");
-+        env.remove("VK_LAYER_PATH");
-+        env.remove("XLOCALEDIR");
-+        env.remove("GDK_PIXBUF_MODULEDIR");
-+        env.remove("GDK_PIXBUF_MODULE_FILE");
-+        env.remove("GTK_PATH");
-+        env.remove("XDG_CONFIG_HOME");
-+        env.remove("XDG_CACHE_HOME");
-+        env.remove("XDG_DATA_HOME");
-+    }
-+
-+
-     if (self.container.window()) |window| {
-         // On some window protocols we might want to add specific
-         // environment variables to subprocesses, such as WINDOWID on X11.
+         // This is a hack because it ties ourselves (optionally) to the
