@@ -81,14 +81,24 @@ parts:
     prime:
       - -*
 
+  blueprint-compiler:
+    plugin: meson
+    source: https://gitlab.gnome.org/jwestman/blueprint-compiler.git
+    source-tag: 'v0.18.0'
+    source-depth: 1
+    meson-parameters:
+      - --prefix=/usr
+    build-packages:
+      - meson
+    prime:
+      - -*
+
   ghostty:
     source: https://github.com/ghostty-org/ghostty.git
     source-tag: $SNAPCRAFT_PROJECT_VERSION
-    after: [zig, ncurses]
+    after: [zig, ncurses, blueprint-compiler]
     plugin: nil
     build-attributes: [enable-patchelf]
-    build-snaps:
-      - blueprint-compiler
     build-packages:
       - libgtk-4-dev
       - libadwaita-1-dev
@@ -96,11 +106,13 @@ parts:
       - git
       - patchelf
       - gettext
+      - python3-gi
     build-environment:
       - TERMINFO: $CRAFT_STAGE/usr/share/terminfo
       - PATH: $CRAFT_STAGE/usr/bin:$PATH
       - LD_LIBRARY_PATH: $CRAFT_STAGE/usr/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
-
+      - GI_TYPELIB_PATH: $CRAFT_STAGE/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/girepository-1.0:$CRAFT_STAGE/usr/lib/girepository-1.0:/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/girepository-1.0:/usr/lib/girepository-1.0${GI_TYPELIB_PATH:+:$GI_TYPELIB_PATH}
+      - PYTHONPATH: $CRAFT_STAGE/usr/lib/python3/dist-packages:/usr/lib/python3/dist-packages${PYTHONPATH:+:$PYTHONPATH}
     override-pull: |
       craftctl default
       patch -p1 < $SNAPCRAFT_PROJECT_DIR/snap/local/patches/env_cleanup.patch
