@@ -104,9 +104,10 @@ parts:
       done
       craftctl set version=tip-$(date '+%Y%m%d')
     override-build: |
-      # TODO: Remove -fno-sys=gtk4-layer-shell when we upgrade to a version that packages it Ubuntu 24.10+
+      #craftctl set version=tip-$(date '+%Y%m%d')
+      craftctl set version=$(cat VERSION)
       $CRAFT_PART_SRC/../../zig/src/zig build \
-        -Dsnap=true \
+        -Dsnap \
         -Dpatch-rpath=\$ORIGIN/../usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR:/snap/core24/current/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR \
         -Doptimize=ReleaseFast \
         -Dcpu=baseline \
