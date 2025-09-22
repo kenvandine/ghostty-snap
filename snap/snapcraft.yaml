@@ -102,10 +102,9 @@ parts:
       for patch in "$SNAPCRAFT_PROJECT_DIR"/snap/local/patches/*.patch; do
         patch --verbose -p1 < "$patch"
       done
-      craftctl set version=tip-$(date '+%Y%m%d')
+      craftctl set version=$(cat VERSION)
     override-build: |
       #craftctl set version=tip-$(date '+%Y%m%d')
-      craftctl set version=$(cat VERSION)
       $CRAFT_PART_SRC/../../zig/src/zig build \
         -Dsnap \
         -Dpatch-rpath=\$ORIGIN/../usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR:/snap/core24/current/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR \
