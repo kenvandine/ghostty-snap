@@ -87,6 +87,7 @@ parts:
     build-packages:
       - libgtk-4-dev
       - libadwaita-1-dev
+      - libapparmor-dev
       - libxml2-utils
       - git
       - patchelf
@@ -95,9 +96,14 @@ parts:
       - TERMINFO: $CRAFT_STAGE/usr/share/terminfo
       - PATH: $CRAFT_STAGE/usr/bin:$PATH
       - LD_LIBRARY_PATH: $CRAFT_STAGE/usr/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
-    override-build: |
-      #craftctl set version=tip-$(date '+%Y%m%d')
+
+    override-pull: |
+      craftctl default
+      for patch in "$SNAPCRAFT_PROJECT_DIR"/snap/local/patches/*.patch; do
+        patch --verbose -p1 < "$patch"
+      done
       craftctl set version=$(cat VERSION)
+    override-build: |
       $CRAFT_PART_SRC/../../zig/src/zig build \
         -Dsnap \
         -Dpatch-rpath=\$ORIGIN/../usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR:/snap/core24/current/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR \
