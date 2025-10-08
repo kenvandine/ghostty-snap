@@ -1,0 +1,93 @@
+From 099631e45143b4d0b937a312b07ffe0b02c9f9e0 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Marco=20Trevisan=20=28Trevi=C3=B1o=29?= <mail@3v1n0.net>
+Date: Fri, 19 Sep 2025 06:52:14 +0200
+Subject: [PATCH] surface: Use the unconfined apparmor profile for ghostty
+ children
+
+When launching any process inside ghostty it will use the ghostty
+apparmor profile, this is problematic because any app will be considered
+as part of such security environment, and GNOME Shell will use this to
+map the windows as part of the same ghostty application.
+
+To prevent this, ensure that the ghostty children will be launched in
+the unconfined profile, as it would happen for any app.
+
+Of course when launching another snap, it will be then added to the
+expected apparmor profile.
+---
+ src/Surface.zig          | 20 ++++++++++++++++++++
+ src/build/SharedDeps.zig |  6 ++++++
+ 2 files changed, 26 insertions(+)
+
+diff --git a/src/Surface.zig b/src/Surface.zig
+index 8edeadf83..d18e569c5 100644
+--- a/src/Surface.zig
++++ b/src/Surface.zig
+@@ -16,6 +16,7 @@ pub const Mailbox = apprt.surface.Mailbox;
+ pub const Message = apprt.surface.Message;
+ 
+ const std = @import("std");
++const build_config = @import("build_config.zig");
+ const builtin = @import("builtin");
+ const assert = std.debug.assert;
+ const Allocator = std.mem.Allocator;
+@@ -389,6 +390,8 @@ const DerivedConfig = struct {
+     }
+ };
+ 
++pub extern "c" fn aa_change_onexec(profile: [*:0]const u8) callconv(.C) c_int;
++
+ /// Create a new surface. This must be called from the main thread. The
+ /// pointer to the memory for the surface must be provided and must be
+ /// stable due to interfacing with various callbacks.
+@@ -548,6 +551,23 @@ pub fn init(
+     else
+         config.command;
+ 
++    if (build_config.snap) {
++        // When in a snap, run the children as unconfined, otherwise they
++        // will get the same security label of the ghostty itself.
++
++        // We don't care about the return value here.
++        const label = "unconfined";
++        const res = aa_change_onexec(label);
++        if (res == 0) {
++            log.debug("Child appArmor profile will be changed to '{s}'\n", .{label});
++        } else {
++            log.warn("Failed to change AppArmor profile to '{s}': {}\n", .{
++                label,
++                res,
++            });
++        }
++    }
++
+     // Start our IO implementation
+     // This separate block ({}) is important because our errdefers must
+     // be scoped here to be valid.
+diff --git a/src/build/SharedDeps.zig b/src/build/SharedDeps.zig
+index 77dec3350..f04ba1955 100644
+--- a/src/build/SharedDeps.zig
++++ b/src/build/SharedDeps.zig
+@@ -549,6 +549,9 @@ pub fn add(
+         // get access to glib for dbus.
+         if (self.config.flatpak) step.linkSystemLibrary2("gtk4", dynamic_link_opts);
+ 
++        // If we're targeting snap, we need the apparmor library.
++        if (self.config.snap) step.linkSystemLibrary2("apparmor", dynamic_link_opts);
++
+         switch (self.config.app_runtime) {
+             .none => {},
+             .gtk => try self.addGtkNg(step),
+@@ -594,6 +597,9 @@ fn addGtkNg(
+     step.linkSystemLibrary2("gtk4", dynamic_link_opts);
+     step.linkSystemLibrary2("libadwaita-1", dynamic_link_opts);
+ 
++    // If we're targeting snap, we need apparmor library.
++    if (self.config.snap) step.linkSystemLibrary2("apparmor", dynamic_link_opts);
++
+     if (self.config.x11) {
+         step.linkSystemLibrary2("X11", dynamic_link_opts);
+         if (gobject_) |gobject| {
+-- 
+2.43.0
+

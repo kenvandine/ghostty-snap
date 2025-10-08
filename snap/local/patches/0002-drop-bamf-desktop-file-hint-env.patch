@@ -1,0 +1,12 @@
+diff --git a/src/apprt/gtk/class/surface.zig b/src/apprt/gtk/class/surface.zig
+index cc8359b7e..20e919026 100644
+--- a/src/apprt/gtk/class/surface.zig
++++ b/src/apprt/gtk/class/surface.zig
+@@ -1370,6 +1370,7 @@ pub const Surface = extern struct {
+             "SNAP_USER_DATA",
+             "SNAP_DATA",
+             "SNAP_COMMON",
++            "BAMF_DESKTOP_FILE_HINT",
+         };
+ 
+         // Use an arena because everything in this function is temporary.
