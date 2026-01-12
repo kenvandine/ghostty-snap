@@ -1,0 +1,7 @@
+#!/bin/sh
+set -e
+
+echo "Running: $SNAP/bin/ghostty --gtk-single-instance=true --initial-window=false"
+
+cd $HOME
+exec $SNAP/bin/ghostty --gtk-single-instance=true --initial-window=false

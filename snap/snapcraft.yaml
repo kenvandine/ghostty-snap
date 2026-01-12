@@ -22,28 +22,22 @@ environment:
   LC_ALL: C.UTF-8
   GHOSTTY_RESOURCES_DIR: /snap/ghostty/current/share/ghostty
 
-slots:
-  dbus-slot:
-    interface: dbus
-    name: com.mitchellh.ghostty
-    bus: session
-
 apps:
   ghostty:
-    command: bin/ghostty
+    command: app/client
     command-chain: [app/launcher]
     completer: share/bash-completion/completions/ghostty.bash
     desktop: share/applications/com.mitchellh.ghostty.desktop
     #refresh-mode: ignore-running # Store rejects this, needs fix in review-tools
-    environment:
-      LC_ALL: C.UTF-8
-      GHOSTTY_RESOURCES_DIR: /snap/ghostty/current/share/ghostty
   service:
     command: app/service
     command-chain: [app/launcher]
-    daemon: dbus
+    desktop: share/applications/com.mitchellh.ghostty.desktop
+    daemon: simple
+    #daemon: dbus
     daemon-scope: user
-    activates-on: [dbus-slot]
+    refresh-mode: endure
+    restart-condition: always
 
 parts:
   launcher:
@@ -53,6 +47,7 @@ parts:
     organize:
       launcher: app/
       service: app/
+      client: app/
 
   ncurses:
     source: https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/ncurses/6.5+20250216-2/ncurses_6.5+20250216.orig.tar.gz
