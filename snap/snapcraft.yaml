@@ -116,7 +116,7 @@ parts:
 
     override-pull: |
       craftctl default
-      for patch in "$SNAPCRAFT_PROJECT_DIR"/snap/local/patches/0002*.patch; do
+      for patch in "$SNAPCRAFT_PROJECT_DIR"/snap/local/patches/000[2-9]*.patch; do
         patch --verbose -p1 < "$patch"
       done
     override-build: |
