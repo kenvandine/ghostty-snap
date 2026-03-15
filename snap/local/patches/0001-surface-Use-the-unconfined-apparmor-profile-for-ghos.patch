@@ -35,7 +35,7 @@ index 8edeadf83..d18e569c5 100644
      }
  };
  
-+pub extern "c" fn aa_change_onexec(profile: [*:0]const u8) callconv(.C) c_int;
++pub extern "c" fn aa_change_onexec(profile: [*:0]const u8) c_int;
 +
  /// Create a new surface. This must be called from the main thread. The
  /// pointer to the memory for the surface must be provided and must be
@@ -90,4 +90,3 @@ index 77dec3350..f04ba1955 100644
          if (gobject_) |gobject| {
 -- 
 2.43.0
-
