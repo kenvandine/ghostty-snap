@@ -20,7 +20,7 @@ expected apparmor profile.
  2 files changed, 26 insertions(+)
 
 diff --git a/src/Surface.zig b/src/Surface.zig
-index 8edeadf83..d18e569c5 100644
+index f494f6c..9d59a33 100644
 --- a/src/Surface.zig
 +++ b/src/Surface.zig
 @@ -16,6 +16,7 @@ pub const Mailbox = apprt.surface.Mailbox;
@@ -29,9 +29,9 @@ index 8edeadf83..d18e569c5 100644
  const std = @import("std");
 +const build_config = @import("build_config.zig");
  const builtin = @import("builtin");
- const assert = std.debug.assert;
+ const assert = @import("quirks.zig").inlineAssert;
  const Allocator = std.mem.Allocator;
-@@ -389,6 +390,8 @@ const DerivedConfig = struct {
+@@ -458,6 +459,8 @@ const DerivedConfig = struct {
      }
  };
  
@@ -40,9 +40,9 @@ index 8edeadf83..d18e569c5 100644
  /// Create a new surface. This must be called from the main thread. The
  /// pointer to the memory for the surface must be provided and must be
  /// stable due to interfacing with various callbacks.
-@@ -548,6 +551,23 @@ pub fn init(
-     else
-         config.command;
+@@ -632,6 +635,23 @@ pub fn init(
+         break :command config.command;
+     };
  
 +    if (build_config.snap) {
 +        // When in a snap, run the children as unconfined, otherwise they
@@ -65,28 +65,28 @@ index 8edeadf83..d18e569c5 100644
      // This separate block ({}) is important because our errdefers must
      // be scoped here to be valid.
 diff --git a/src/build/SharedDeps.zig b/src/build/SharedDeps.zig
-index 77dec3350..f04ba1955 100644
+index 86cfecc..ebb3e05 100644
 --- a/src/build/SharedDeps.zig
 +++ b/src/build/SharedDeps.zig
-@@ -549,6 +549,9 @@ pub fn add(
-         // get access to glib for dbus.
-         if (self.config.flatpak) step.linkSystemLibrary2("gtk4", dynamic_link_opts);
+@@ -687,6 +687,9 @@ pub fn add(
+             }
+         }
  
 +        // If we're targeting snap, we need the apparmor library.
-+        if (self.config.snap) step.linkSystemLibrary2("apparmor", dynamic_link_opts);
++        if (self.config.snap) step.root_module.linkSystemLibrary("apparmor", dynamic_link_opts);
 +
          switch (self.config.app_runtime) {
              .none => {},
              .gtk => try self.addGtkNg(step),
-@@ -594,6 +597,9 @@ fn addGtkNg(
-     step.linkSystemLibrary2("gtk4", dynamic_link_opts);
-     step.linkSystemLibrary2("libadwaita-1", dynamic_link_opts);
+@@ -765,6 +768,9 @@ fn addGtkNg(
+         }
+     }
  
 +    // If we're targeting snap, we need apparmor library.
-+    if (self.config.snap) step.linkSystemLibrary2("apparmor", dynamic_link_opts);
++    if (self.config.snap) step.root_module.linkSystemLibrary("apparmor", dynamic_link_opts);
 +
      if (self.config.x11) {
-         step.linkSystemLibrary2("X11", dynamic_link_opts);
+         step.root_module.linkSystemLibrary("X11", dynamic_link_opts);
          if (gobject_) |gobject| {
 -- 
 2.43.0

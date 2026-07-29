@@ -1,0 +1,16 @@
+diff --git a/pkg/gtk4-layer-shell/build.zig b/pkg/gtk4-layer-shell/build.zig
+index e7edb76..06692cd 100644
+--- a/pkg/gtk4-layer-shell/build.zig
++++ b/pkg/gtk4-layer-shell/build.zig
+@@ -38,6 +38,11 @@ pub fn build(b: *std.Build) !void {
+                 &link_system_libs_full
+             else
+                 link_system_libs_full[0..1],
+         });
++        if (!b.systemIntegrationOption("gtk4-layer-shell", .{})) {
++            if (b.lazyDependency("gtk4_layer_shell", .{})) |upstream| {
++                headers.addIncludePath(upstream.path("include"));
++            }
++        }
+         module.addImport("c", headers.mod);
+     }

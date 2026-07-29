@@ -67,7 +67,7 @@ parts:
       rm -rf $CRAFT_PART_SRC/*
 
       if [[ -n $arch ]]; then
-        curl -LO --retry-connrefused --retry 10 https://ziglang.org/download/0.15.2/zig-$arch-linux-0.15.2.tar.xz
+        curl -LO --retry-connrefused --retry 10 https://ziglang.org/download/0.16.0/zig-$arch-linux-0.16.0.tar.xz
       else
         echo "Unsupported arch"
         exit 1
@@ -103,10 +103,28 @@ parts:
         patch --verbose -p1 < "$patch"
       done
       craftctl set version=$(cat VERSION)
+
+      EXISTING_NS=$(grep -oE 'nameserver +[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' /etc/resolv.conf 2>/dev/null | grep -v '127\.0\.0\.' || true)
+      rm -f /etc/resolv.conf
+      if [ -n "$EXISTING_NS" ]; then
+        echo "$EXISTING_NS" > /etc/resolv.conf
+      else
+        printf "nameserver 1.1.1.1\nnameserver 8.8.8.8\n" > /etc/resolv.conf
+      fi
+
+      $CRAFT_PART_SRC/../../zig/src/zig build --fetch --global-cache-dir $CRAFT_PART_SRC/.zig-cache
     override-build: |
+      EXISTING_NS=$(grep -oE 'nameserver +[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' /etc/resolv.conf 2>/dev/null | grep -v '127\.0\.0\.' || true)
+      rm -f /etc/resolv.conf
+      if [ -n "$EXISTING_NS" ]; then
+        echo "$EXISTING_NS" > /etc/resolv.conf
+      else
+        printf "nameserver 1.1.1.1\nnameserver 8.8.8.8\n" > /etc/resolv.conf
+      fi
+
       $CRAFT_PART_SRC/../../zig/src/zig build \
+        --global-cache-dir $CRAFT_PART_SRC/.zig-cache \
         -Dsnap \
-        -Dpatch-rpath=\$ORIGIN/../usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR:/snap/core24/current/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR \
         -Doptimize=ReleaseFast \
         -Dcpu=baseline \
         -fno-sys=gtk4-layer-shell
