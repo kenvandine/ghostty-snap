@@ -37,7 +37,7 @@ parts:
       launcher: app/
 
   ncurses:
-    source: https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/ncurses/6.5+20250216-2/ncurses_6.5+20250216.orig.tar.gz
+    source: https://ftp.gnu.org/pub/gnu/ncurses/ncurses-6.5.tar.gz
     plugin: autotools
     build-attributes: [enable-patchelf]
     autotools-configure-parameters:
