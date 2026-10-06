@@ -67,7 +67,7 @@ parts:
       rm -rf $CRAFT_PART_SRC/*
 
       if [[ -n $arch ]]; then
-        curl -LO --retry-connrefused --retry 10 https://ziglang.org/download/0.16.0/zig-$arch-linux-0.16.0.tar.xz
+        curl -LO --retry-connrefused --retry 10 https://ziglang.org/download/0.13.0/zig-$arch-linux-0.13.0.tar.xz
       else
         echo "Unsupported arch"
         exit 1
@@ -99,8 +99,11 @@ parts:
 
     override-pull: |
       craftctl default
-      for patch in "$SNAPCRAFT_PROJECT_DIR"/snap/local/patches/000*.patch; do
-        patch --verbose -p1 < "$patch"
+      # Apply patches properly
+      for patch in "$SNAPCRAFT_PROJECT_DIR"/snap/local/patches/*.patch; do
+        if [ -f "$patch" ]; then
+          patch --verbose -p1 < "$patch"
+        fi
       done
       craftctl set version=$(cat VERSION)
 
@@ -192,3 +195,4 @@ parts:
       - usr/lib/*/libgallium*so
       - -usr/lib/*/dri/libdril_dri.so
       - usr/lib/*/dri
+
