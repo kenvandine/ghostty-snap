@@ -112,7 +112,8 @@ parts:
         printf "nameserver 1.1.1.1\nnameserver 8.8.8.8\n" > /etc/resolv.conf
       fi
 
-      $CRAFT_PART_SRC/../../zig/src/zig build --fetch --global-cache-dir $CRAFT_PART_SRC/.zig-cache
+      export ZIG_GLOBAL_CACHE_DIR=$CRAFT_PART_SRC/.zig-cache
+      $CRAFT_PART_SRC/../../zig/src/zig build --fetch
     override-build: |
       EXISTING_NS=$(grep -oE 'nameserver +[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' /etc/resolv.conf 2>/dev/null | grep -v '127\.0\.0\.' || true)
       rm -f /etc/resolv.conf
@@ -122,8 +123,8 @@ parts:
         printf "nameserver 1.1.1.1\nnameserver 8.8.8.8\n" > /etc/resolv.conf
       fi
 
+      export ZIG_GLOBAL_CACHE_DIR=$CRAFT_PART_SRC/.zig-cache
       $CRAFT_PART_SRC/../../zig/src/zig build \
-        --global-cache-dir $CRAFT_PART_SRC/.zig-cache \
         -Dsnap \
         -Doptimize=ReleaseFast \
         -Dcpu=baseline \
