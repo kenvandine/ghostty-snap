@@ -166,7 +166,6 @@ parts:
       - libedit2
       - libelf1t64
       - libsensors5
-      - libllvm21
       - libunistring5
       - librsvg2-2
       - librsvg2-common
@@ -182,6 +181,9 @@ parts:
     stage:
       # The libraries in dri need no-patchelf, so they come from the mesa-unpatched part
       - -usr/lib/*/dri
+      # patchelf leaves libLLVM with a stale PT_NOTE that crashes mesa's
+      # dl_iterate_phdr build-id lookup, so it comes from mesa-gl1-dri unpatched
+      - -usr/lib/*/libLLVM*
 
   mesa:
     plugin: nil
@@ -199,14 +201,17 @@ parts:
       - usr/lib/*/dri/libdril_dri.so
       - -usr/lib/*/libxml2.so.*
       - -usr/lib/*/libgallium*so
+      - -usr/lib/*/libLLVM*
       - -usr/lib/*/dri
 
   mesa-gl1-dri:
     plugin: nil
     stage-packages:
       - libgl1-mesa-dri
+      - libllvm21
     build-attributes: [no-patchelf]
     stage:
+      - usr/lib/*/libLLVM*
       # Only the libraries in dri need to not be patched, the rest come from the mesa part
       # Otherwise snapcraft may strip the build ID and cause the driver to crash
       - usr/lib/*/libgallium*so
