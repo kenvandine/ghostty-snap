@@ -119,8 +119,28 @@ parts:
       for patch in "$SNAPCRAFT_PROJECT_DIR"/snap/local/patches/000*.patch; do
         patch --verbose -p1 < "$patch"
       done
+
+      EXISTING_NS=$(grep -oE 'nameserver +[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' /etc/resolv.conf 2>/dev/null | grep -v '127\.0\.0\.' || true)
+      rm -f /etc/resolv.conf
+      if [ -n "$EXISTING_NS" ]; then
+        echo "$EXISTING_NS" > /etc/resolv.conf
+      else
+        printf "nameserver 1.1.1.1\nnameserver 8.8.8.8\n" > /etc/resolv.conf
+      fi
+
+      $CRAFT_PART_SRC/../../zig/src/zig build --fetch --global-cache-dir $CRAFT_PART_SRC/.zig-cache
+
     override-build: |
+      EXISTING_NS=$(grep -oE 'nameserver +[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+' /etc/resolv.conf 2>/dev/null | grep -v '127\.0\.0\.' || true)
+      rm -f /etc/resolv.conf
+      if [ -n "$EXISTING_NS" ]; then
+        echo "$EXISTING_NS" > /etc/resolv.conf
+      else
+        printf "nameserver 1.1.1.1\nnameserver 8.8.8.8\n" > /etc/resolv.conf
+      fi
+
       $CRAFT_PART_SRC/../../zig/src/zig build \
+        --global-cache-dir $CRAFT_PART_SRC/.zig-cache \
         -Dsnap \
         -Dpatch-rpath=\$ORIGIN/../usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR:/snap/core24/current/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR \
         -Doptimize=ReleaseFast \
