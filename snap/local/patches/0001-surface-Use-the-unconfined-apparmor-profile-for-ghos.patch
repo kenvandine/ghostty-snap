@@ -65,28 +65,18 @@ index 8edeadf83..d18e569c5 100644
      // This separate block ({}) is important because our errdefers must
      // be scoped here to be valid.
 diff --git a/src/build/SharedDeps.zig b/src/build/SharedDeps.zig
-index 77dec3350..f04ba1955 100644
+index 8f4e239..02c1939 100644
 --- a/src/build/SharedDeps.zig
 +++ b/src/build/SharedDeps.zig
-@@ -549,6 +549,9 @@ pub fn add(
-         // get access to glib for dbus.
-         if (self.config.flatpak) step.linkSystemLibrary2("gtk4", dynamic_link_opts);
+@@ -688,6 +688,9 @@ pub fn add(
+             });
+         }
  
 +        // If we're targeting snap, we need the apparmor library.
-+        if (self.config.snap) step.linkSystemLibrary2("apparmor", dynamic_link_opts);
++        if (self.config.snap) step.root_module.linkSystemLibrary("apparmor", dynamic_link_opts);
 +
          switch (self.config.app_runtime) {
              .none => {},
-             .gtk => try self.addGtkNg(step),
-@@ -594,6 +597,9 @@ fn addGtkNg(
-     step.linkSystemLibrary2("gtk4", dynamic_link_opts);
-     step.linkSystemLibrary2("libadwaita-1", dynamic_link_opts);
- 
-+    // If we're targeting snap, we need apparmor library.
-+    if (self.config.snap) step.linkSystemLibrary2("apparmor", dynamic_link_opts);
-+
-     if (self.config.x11) {
-         step.linkSystemLibrary2("X11", dynamic_link_opts);
-         if (gobject_) |gobject| {
+             .gtk => try self.addGtk(step),
 -- 
 2.43.0
