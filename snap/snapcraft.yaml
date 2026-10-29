@@ -1,6 +1,6 @@
 name: ghostty
 version: v1.4.0
-base: core24
+base: core26
 summary: A terminal emulator
 description: |
   Ghostty is a fast, feature-rich, and cross-platform terminal emulator that
@@ -83,7 +83,7 @@ parts:
   blueprint-compiler:
     plugin: meson
     source: https://gitlab.gnome.org/jwestman/blueprint-compiler.git
-    source-tag: 'v0.18.0'
+    source-tag: 'v0.20.4'
     source-depth: 1
     meson-parameters:
       - --prefix=/usr
@@ -143,7 +143,7 @@ parts:
       export ZIG_GLOBAL_CACHE_DIR=$CRAFT_PART_SRC/.zig-cache
       $CRAFT_PART_SRC/../../zig/src/zig build \
         -Dsnap \
-        -Dpatch-rpath=\$ORIGIN/../usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR:/snap/core24/current/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR \
+        -Dpatch-rpath=\$ORIGIN/../usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR:/snap/core26/current/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR \
         -Doptimize=ReleaseFast \
         -Dcpu=baseline \
         -fno-sys=gtk4-layer-shell
@@ -157,7 +157,6 @@ parts:
       - libadwaita-1-0
       - libglib2.0-0t64
       - libgtk-4-1
-      - libgtk-4-media-gstreamer
       - libgtksourceview-5-0
       - ibus-gtk4
       - libpciaccess0
@@ -165,7 +164,7 @@ parts:
       - libedit2
       - libelf1t64
       - libsensors5
-      - libllvm17
+      - libllvm21
       - libunistring5
       - librsvg2-2
       - librsvg2-common
