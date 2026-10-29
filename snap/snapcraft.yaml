@@ -46,6 +46,8 @@ parts:
       - --with-shared
       - --without-debug
       - --without-ada
+      - --without-cxx
+      - --without-cxx-binding
       - --enable-rpath
       - --prefix=/usr
     build-packages:
