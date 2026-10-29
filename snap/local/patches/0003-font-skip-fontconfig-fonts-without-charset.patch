@@ -1,0 +1,78 @@
+diff --git a/src/font/discovery.zig b/src/font/discovery.zig
+index 4d76af8..b00dc2f 100644
+--- a/src/font/discovery.zig
++++ b/src/font/discovery.zig
+@@ -314,31 +314,51 @@ pub const Fontconfig = struct {
+         }
+ 
+         pub fn next(self: *DiscoverIterator) fontconfig.Error!?DeferredFace {
+-            if (self.i >= self.fonts.len) return null;
++            while (self.i < self.fonts.len) {
++                // Get the copied pattern from our fontset that has the
++                // attributes configured for rendering.
++                const font_pattern = try self.config.fontRenderPrepare(
++                    self.pattern,
++                    self.fonts[self.i],
++                );
+ 
+-            // Get the copied pattern from our fontset that has the
+-            // attributes configured for rendering.
+-            const font_pattern = try self.config.fontRenderPrepare(
+-                self.pattern,
+-                self.fonts[self.i],
+-            );
+-            errdefer font_pattern.destroy();
++                // Increment after we return
++                defer self.i += 1;
++
++                // Some fonts have no charset (e.g. ones fontconfig could
++                // only partially read). Skip them instead of failing
++                // discovery for every font.
++                const charset = font_pattern.get(.charset, 0) catch |err| switch (err) {
++                    error.FontconfigNoMatch => {
++                        font_pattern.destroy();
++                        continue;
++                    },
++                    else => {
++                        font_pattern.destroy();
++                        return err;
++                    },
++                };
+ 
+-            // Increment after we return
+-            defer self.i += 1;
++                // NOTE: In vast majority of situations this contains a
++                // `*const LangSet`, but Fontconfig falls back to a simple string
++                // ("en") if the pattern fails to match any language. Bad bad bad
++                // bad API design. But we must handle it gracefully here.
++                const langset = font_pattern.get(.lang, 0) catch |err| {
++                    font_pattern.destroy();
++                    return err;
++                };
+ 
+-            return DeferredFace{
+-                .fc = .{
+-                    .pattern = font_pattern,
+-                    .charset = (try font_pattern.get(.charset, 0)).char_set,
+-                    // NOTE: In vast majority of situations this contains a
+-                    // `*const LangSet`, but Fontconfig falls back to a simple string
+-                    // ("en") if the pattern fails to match any language. Bad bad bad
+-                    // bad API design. But we must handle it gracefully here.
+-                    .langset = try font_pattern.get(.lang, 0),
+-                    .variations = self.variations,
+-                },
+-            };
++                return DeferredFace{
++                    .fc = .{
++                        .pattern = font_pattern,
++                        .charset = charset.char_set,
++                        .langset = langset,
++                        .variations = self.variations,
++                    },
++                };
++            }
++
++            return null;
+         }
+     };
+ };
