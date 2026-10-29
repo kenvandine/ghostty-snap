@@ -1,5 +1,5 @@
 name: ghostty
-base: core24
+base: core26
 summary: A terminal emulator
 description: |
   Ghostty is a fast, feature-rich, and cross-platform terminal emulator that
