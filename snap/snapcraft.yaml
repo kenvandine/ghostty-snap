@@ -153,6 +153,8 @@ parts:
       - libglib2.0-0t64
       - libgtk-4-1
       - libgtk4-layer-shell0
+      - gstreamer1.0-plugins-base
+      - gstreamer1.0-plugins-good
       - ibus-gtk4
       - libpciaccess0
       - libtinfo6
