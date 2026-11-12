@@ -1,5 +1,5 @@
 name: ghostty
-version: vt-1.0.0
+version: vt-1.0.1
 base: core26
 summary: A terminal emulator
 description: |
